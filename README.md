@@ -1,3 +1,1 @@
 Buna prieteni
-
-Salutare
