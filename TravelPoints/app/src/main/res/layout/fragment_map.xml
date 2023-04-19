@@ -5,10 +5,10 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.MapFragment">
 
-    <TextView
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/map_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Google Maps"
-        android:gravity="center"/>
+        android:visibility="visible"/>
 
 </FrameLayout>
