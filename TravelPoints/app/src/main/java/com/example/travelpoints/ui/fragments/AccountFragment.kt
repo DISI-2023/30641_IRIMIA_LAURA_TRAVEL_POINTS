@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import com.example.travelpoints.ui.theme.TravelPointsTheme
 import com.example.travelpoints.ui.views.AccountView
 
-class AccountFragment: Fragment() {
+class AccountFragment(private val navigateToLoginFragment: () -> Unit): Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -19,7 +19,7 @@ class AccountFragment: Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 TravelPointsTheme {
-                    AccountView()
+                    AccountView(navigateToLoginFragment)
                 }
             }
         }
