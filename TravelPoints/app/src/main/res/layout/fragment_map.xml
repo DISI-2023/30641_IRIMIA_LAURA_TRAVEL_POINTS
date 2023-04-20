@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,4 +12,87 @@
         android:layout_height="match_parent"
         android:visibility="visible"/>
 
-</FrameLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/white"
+        android:alpha="0.7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/park_icon"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/park_drawable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+            </ImageView>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Park"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toTopOf="@id/park_icon"
+                app:layout_constraintBottom_toBottomOf="@id/park_icon"
+                app:layout_constraintStart_toEndOf="@id/park_icon"
+                android:gravity="center"
+                android:layout_marginStart="5dp">
+            </TextView>
+
+            <ImageView
+                android:id="@+id/museum_icon"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/museum_drawable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/park_icon">
+            </ImageView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Museum"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toTopOf="@id/museum_icon"
+                app:layout_constraintBottom_toBottomOf="@id/museum_icon"
+                app:layout_constraintStart_toEndOf="@id/museum_icon"
+                android:gravity="center"
+                android:layout_marginStart="5dp">
+            </TextView>
+
+            <ImageView
+                android:id="@+id/monument_icon"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/monument_drawable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/museum_icon">
+            </ImageView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Monument"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toTopOf="@id/monument_icon"
+                app:layout_constraintBottom_toBottomOf="@id/monument_icon"
+                app:layout_constraintStart_toEndOf="@id/monument_icon"
+                android:gravity="center"
+                android:layout_marginStart="5dp">
+            </TextView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
