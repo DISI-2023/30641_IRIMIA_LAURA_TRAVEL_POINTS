@@ -1,5 +1,6 @@
 package com.example.travelpoints
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: MainActivityLayoutBinding
 
     private lateinit var loginFragment: LoginFragment
+    private lateinit var mapFragment: MapFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,13 +22,24 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.Theme_TravelPoints)
 
         setupFragmentNavigation()
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
     private fun setupFragmentNavigation() {
         val accountFragment = AccountFragment(navigateToLoginFragment = {
             supportFragmentManager.beginTransaction().replace(R.id.fragment_container, loginFragment).commit()
         })
-        val mapFragment = MapFragment()
+
+        mapFragment = MapFragment(navigateToSiteCreation = { lat, long ->
+            val siteCreationFragment = SiteCreationFragment(
+                lat = lat,
+                long = long,
+                navigateToMapFragment = {
+                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container, mapFragment).commit()
+                }
+            )
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, siteCreationFragment).commit()
+        })
         val supportFragment = SupportFragment()
         val registerFragment = RegisterFragment(
             navigateToAccountFragment = {
