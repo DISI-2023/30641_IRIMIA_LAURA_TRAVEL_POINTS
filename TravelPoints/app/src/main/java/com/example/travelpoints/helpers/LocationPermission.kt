@@ -23,6 +23,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class LocationPermission {
 
@@ -109,6 +113,31 @@ class LocationPermission {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(a, b),12f))
         map.animateCamera(CameraUpdateFactory.zoomIn())
         map.animateCamera(CameraUpdateFactory.zoomTo(12f))
+
+
+        getAllSites(map)
+    }
+    private fun getAllSites(map: GoogleMap) {
+        val siteNumber = FirebaseDatabase.getInstance().getReference("Sites")
+        siteNumber.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    snapshot.children.forEach {
+                        val lat = it.child("Location").child("Latitude").value.toString().toDouble()
+                        val long = it.child("Location").child("Longitude").value.toString().toDouble()
+                        val siteName = it.child("Name").value.toString()
+                        val siteCategory = it.child("Category").value.toString()
+                        map.addMarker(
+                            MarkerOptions().position(LatLng(lat, long)).title(siteName)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+                        )
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })
     }
 
 }

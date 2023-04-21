@@ -51,7 +51,7 @@ class SiteCreationFragment(
                 if(snapshot.exists()){
                     val currentId = (snapshot.value as Long) + 1
                     siteNumber.setValue(currentId)
-                    val firebaseReference = FirebaseDatabase.getInstance().getReference("Site")
+                    val firebaseReference = FirebaseDatabase.getInstance().getReference("Sites").child("$currentId")
 
                     firebaseReference.child("Location").child("Latitude").setValue(lat)
                     firebaseReference.child("Location").child("Longitude").setValue(long)
