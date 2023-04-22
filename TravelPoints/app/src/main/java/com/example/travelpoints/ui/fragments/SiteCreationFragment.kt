@@ -50,7 +50,6 @@ class SiteCreationFragment(
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.exists()){
                     val currentId = (snapshot.value as Long) + 1
-                    siteNumber.setValue(currentId)
                     val firebaseReference = FirebaseDatabase.getInstance().getReference("Sites").child("$currentId")
 
                     firebaseReference.child("ID").setValue(currentId)
@@ -60,6 +59,8 @@ class SiteCreationFragment(
                     firebaseReference.child("Description").setValue(description)
                     firebaseReference.child("EntryPrice").setValue(entryPrice)
                     firebaseReference.child("Category").setValue(category)
+
+                    siteNumber.setValue(currentId)
                 }
             }
 

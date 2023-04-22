@@ -1,10 +1,12 @@
 package com.example.travelpoints.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.compose.ui.text.toLowerCase
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.travelpoints.adapters.SearchViewAdapter
 import com.example.travelpoints.databinding.FragmentMapBinding
 import com.example.travelpoints.helpers.LocationPermission
+import com.example.travelpoints.models.Site
 import com.example.travelpoints.ui.viewmodels.MapFragmentViewModel
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -20,8 +23,12 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import java.util.*
 
-class MapFragment(private val navigateToSiteCreation: (Double, Double) -> Unit) : Fragment(),
+class MapFragment(
+    private val navigateToSiteCreation: (Double, Double) -> Unit,
+    private val navigateToSiteDetails: (Site) -> Unit
+) : Fragment(),
     OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var binding: FragmentMapBinding
@@ -59,7 +66,7 @@ class MapFragment(private val navigateToSiteCreation: (Double, Double) -> Unit) 
 
         viewModel.sites.observe(viewLifecycleOwner) { sites ->
             if (sites != null) {
-                adapter.dataList = sites.toList()
+                adapter.dataList = sites.map { Pair(it.name, LatLng(it.latitude, it.longitude)) }
             } else {
                 adapter.dataList = emptyList()
             }
@@ -77,8 +84,8 @@ class MapFragment(private val navigateToSiteCreation: (Double, Double) -> Unit) 
                     binding.constraintLayout.isVisible = false
                     val newList = mutableListOf<Pair<String, LatLng>>()
                     viewModel.sites.value?.forEach {
-                        if (it.first.contains(newText)) {
-                            newList.add(it)
+                        if (it.name.lowercase().contains(newText.lowercase())) {
+                            newList.add(Pair(it.name, LatLng(it.latitude, it.longitude)))
                         }
                     }
                     adapter.dataList = newList
@@ -98,19 +105,24 @@ class MapFragment(private val navigateToSiteCreation: (Double, Double) -> Unit) 
         map = googleMap
         LocationPermission().getCurrentLocation(requireActivity(), locationRequest, map)
 
-        map.setOnMapLongClickListener {
-            //if (FirebaseAuth.getInstance().currentUser?.uid.equals("LWtquFDJ0MWlXqTc6ZsukLAklvb2")) {
-//                val databaseReference = FirebaseDatabase.getInstance().getReference("Site").child("Location")
-//                databaseReference.child("Latitude").setValue(it.latitude)
-//                databaseReference.child("Longitude").setValue(it.longitude)
-            navigateToSiteCreation(it.latitude, it.longitude)
+        map.setOnMarkerClickListener(this)
 
+        map.setOnMapLongClickListener {
+            //TODO allow site creation only if logged in user is ADMIN
+            //if (FirebaseAuth.getInstance().currentUser?.uid.equals("LWtquFDJ0MWlXqTc6ZsukLAklvb2")) {
+            navigateToSiteCreation(it.latitude, it.longitude)
         }
-        //}
     }
 
     override fun onMarkerClick(p0: Marker): Boolean {
-        TODO("Not yet implemented")
+        viewModel.sites.observe(viewLifecycleOwner) { sites ->
+            sites?.forEach {
+                if (p0.position.latitude == it.latitude && p0.position.longitude == it.longitude) {
+                    navigateToSiteDetails(it)
+                }
+            }
+        }
+        return true
     }
 
 

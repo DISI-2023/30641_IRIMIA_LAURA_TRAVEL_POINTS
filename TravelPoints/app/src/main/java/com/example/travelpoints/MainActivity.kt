@@ -27,7 +27,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupFragmentNavigation() {
         val accountFragment = AccountFragment(navigateToLoginFragment = {
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, loginFragment).commit()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, loginFragment).commit()
         })
 
         mapFragment = MapFragment(navigateToSiteCreation = { lat, long ->
@@ -35,24 +36,41 @@ class MainActivity : AppCompatActivity() {
                 lat = lat,
                 long = long,
                 navigateToMapFragment = {
-                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container, mapFragment).commit()
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, mapFragment).commit()
                 }
             )
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, siteCreationFragment).commit()
-        })
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, siteCreationFragment).commit()
+        },
+            navigateToSiteDetails = {
+                val siteDetailsFragment = SiteDetailsFragment(
+                    site = it,
+                    navigateToMapFragment = {
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, mapFragment).commit()
+                    }
+                )
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, siteDetailsFragment).commit()
+            })
         val supportFragment = SupportFragment()
         val registerFragment = RegisterFragment(
             navigateToAccountFragment = {
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, accountFragment).commit()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, accountFragment).commit()
             }, navigateToLoginFragment = {
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, loginFragment).commit()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, loginFragment).commit()
             })
         loginFragment = LoginFragment(
             navigateToRegisterFragment = {
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, registerFragment).commit()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, registerFragment).commit()
             },
             navigateToAccountFragment = {
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_container, accountFragment).commit()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, accountFragment).commit()
             }
         )
 
@@ -60,7 +78,8 @@ class MainActivity : AppCompatActivity() {
         val bottomBar = binding.bottomNavigationView
 
         bottomBar.selectedItemId = R.id.map
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, mapFragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, mapFragment)
+            .commit()
 
         binding.bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
