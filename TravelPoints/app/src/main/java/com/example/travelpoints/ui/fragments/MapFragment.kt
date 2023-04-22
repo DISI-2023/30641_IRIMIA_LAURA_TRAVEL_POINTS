@@ -59,7 +59,7 @@ class MapFragment(private val navigateToSiteCreation: (Double, Double) -> Unit) 
 
         viewModel.sites.observe(viewLifecycleOwner) { sites ->
             if (sites != null) {
-                adapter.dataList = sites
+                adapter.dataList = sites.toList()
             } else {
                 adapter.dataList = emptyList()
             }
@@ -72,24 +72,23 @@ class MapFragment(private val navigateToSiteCreation: (Double, Double) -> Unit) 
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                newText.let { text ->
-                    if (text.isNotEmpty() && text.isNotBlank()) {
-                        binding.recyclerView.isVisible = true
-                        binding.constraintLayout.isVisible = false
-                        val newList = mutableListOf<Pair<String, LatLng>>()
-                        viewModel.sites.value?.forEach {
-                            if (it.first.contains(newText)) {
-                                newList.add(it)
-                            }
+                if (newText.isNotEmpty() && newText.isNotBlank()) {
+                    binding.recyclerView.isVisible = true
+                    binding.constraintLayout.isVisible = false
+                    val newList = mutableListOf<Pair<String, LatLng>>()
+                    viewModel.sites.value?.forEach {
+                        if (it.first.contains(newText)) {
+                            newList.add(it)
                         }
-                        adapter.dataList = newList
-
-                    } else {
-                        binding.recyclerView.isVisible = false
-                        binding.constraintLayout.isVisible = true
-                        
                     }
+                    adapter.dataList = newList
+
+                } else {
+                    binding.recyclerView.isVisible = false
+                    binding.constraintLayout.isVisible = true
+
                 }
+
                 return false
             }
         })
@@ -113,6 +112,8 @@ class MapFragment(private val navigateToSiteCreation: (Double, Double) -> Unit) 
     override fun onMarkerClick(p0: Marker): Boolean {
         TODO("Not yet implemented")
     }
+
+
 
     private fun onSiteClicked(latLng: LatLng) {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13f))

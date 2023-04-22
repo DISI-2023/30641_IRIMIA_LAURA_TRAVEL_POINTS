@@ -10,10 +10,10 @@ import com.google.firebase.database.ValueEventListener
 
 class MapFragmentViewModel: ViewModel() {
 
-    val sites = MutableLiveData<List<Pair<String, LatLng>>>(null)
+    val sites = MutableLiveData<Set<Pair<String, LatLng>>>(null)
 
     fun getAllSites() {
-        val newSites = mutableListOf<Pair<String, LatLng>>()
+        val newSites = mutableSetOf<Pair<String, LatLng>>()
         val siteNumber = FirebaseDatabase.getInstance().getReference("Sites")
         siteNumber.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
