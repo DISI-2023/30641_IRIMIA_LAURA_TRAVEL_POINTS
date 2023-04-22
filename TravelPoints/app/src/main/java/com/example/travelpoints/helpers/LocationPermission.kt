@@ -1,24 +1,32 @@
 package com.example.travelpoints.helpers
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.IntentSender
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.location.LocationManager
 import android.os.Looper
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import com.example.travelpoints.models.Site
+import com.example.travelpoints.models.fromStringToCategory
+import com.example.travelpoints.models.getMarkerIcon
+import com.example.travelpoints.util.drawableToBitmap
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.*
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.GroundOverlayOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.OnCompleteListener
@@ -27,6 +35,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+
 
 class LocationPermission {
 
@@ -52,7 +61,7 @@ class LocationPermission {
                                 val latitude = locationResult.locations[index].latitude
                                 val longitude = locationResult.locations[index].longitude
 
-                                setMarkerOnMap(map, latitude, longitude, activity)
+                                setMarkerOnCurrentPosition(map, latitude, longitude, activity)
                             }
                         }
 
@@ -106,30 +115,46 @@ class LocationPermission {
         })
     }
 
-    fun setMarkerOnMap(map: GoogleMap, a: Double, b: Double, context: Context) {
-        val marker = MarkerOptions().position(LatLng(a, b)).title("Marker").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory
-            .HUE_AZURE))
+    @SuppressLint("UseCompatLoadingForDrawables")
+    fun setMarkerOnCurrentPosition(map: GoogleMap, a: Double, b: Double, context: Context) {
+        val drawable: Drawable = context.resources.getDrawable(context.resources.getIdentifier("current_location_drawable", "drawable", context.packageName))
+        val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(drawableToBitmap(drawable)!!)
+
+        val marker = MarkerOptions().position(LatLng(a, b)).title("You are here").icon(bitmapDescriptor)
         map.addMarker(marker)
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(a, b),12f))
         map.animateCamera(CameraUpdateFactory.zoomIn())
         map.animateCamera(CameraUpdateFactory.zoomTo(12f))
 
 
-        getAllSites(map)
+        getAllSites(map, context)
     }
-    private fun getAllSites(map: GoogleMap) {
+    private fun getAllSites(map: GoogleMap, context: Context) {
         val siteNumber = FirebaseDatabase.getInstance().getReference("Sites")
         siteNumber.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     snapshot.children.forEach {
-                        val lat = it.child("Location").child("Latitude").value.toString().toDouble()
-                        val long = it.child("Location").child("Longitude").value.toString().toDouble()
-                        val siteName = it.child("Name").value.toString()
-                        val siteCategory = it.child("Category").value.toString()
+                        //val id = it.value.toString().toLong()
+                        val latitude = it.child("Location").child("Latitude").value.toString().toDouble()
+                        val longitude = it.child("Location").child("Longitude").value.toString().toDouble()
+                        val name = it.child("Name").value.toString()
+                        val category = fromStringToCategory(it.child("Category").value.toString())
+                        val description = it.child("Description").value.toString()
+                        //val entryPrice = it.child("EntryPrice").value.toString().toDouble()
+
+//                        val site = Site(
+//                            id = id,
+//                            name = name,
+//                            latitude = latitude,
+//                            longitude = longitude,
+//                            entryPrice = entryPrice,
+//                            description = description,
+//                            category = category
+//                        )
                         map.addMarker(
-                            MarkerOptions().position(LatLng(lat, long)).title(siteName)
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+                            MarkerOptions().position(LatLng(latitude, longitude)).title(name)
+                                .icon(getMarkerIcon(category, context))
                         )
                     }
                 }
@@ -139,5 +164,4 @@ class LocationPermission {
             }
         })
     }
-
 }
