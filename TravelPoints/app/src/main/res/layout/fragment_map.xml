@@ -20,6 +20,7 @@
         android:layout_margin="10dp"
         android:background="@color/white"
         android:clickable="true"
+        app:iconifiedByDefault="false"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintTop_toTopOf="parent"
         app:queryHint="Search for a site..." />
