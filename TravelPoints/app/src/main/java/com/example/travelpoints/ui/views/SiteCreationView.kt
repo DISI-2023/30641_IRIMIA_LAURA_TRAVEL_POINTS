@@ -76,8 +76,6 @@ fun SiteCreationView(
             item {
                 val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
 
-                Text(text = "$lat, $long", color = textColor)
-
                 val focusManager = LocalFocusManager.current
 
                 var name by remember { mutableStateOf("") }
