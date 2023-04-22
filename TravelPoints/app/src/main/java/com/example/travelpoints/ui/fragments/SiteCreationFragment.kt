@@ -53,6 +53,7 @@ class SiteCreationFragment(
                     siteNumber.setValue(currentId)
                     val firebaseReference = FirebaseDatabase.getInstance().getReference("Sites").child("$currentId")
 
+                    firebaseReference.child("ID").setValue(currentId)
                     firebaseReference.child("Location").child("Latitude").setValue(lat)
                     firebaseReference.child("Location").child("Longitude").setValue(long)
                     firebaseReference.child("Name").setValue(name)
