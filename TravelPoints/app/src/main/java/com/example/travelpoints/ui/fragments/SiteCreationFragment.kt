@@ -57,7 +57,7 @@ class SiteCreationFragment(
                     firebaseReference.child("Location").child("Longitude").setValue(long)
                     firebaseReference.child("Name").setValue(name)
                     firebaseReference.child("Description").setValue(description)
-                    firebaseReference.child("EntryPrice").setValue("entryPrice")
+                    firebaseReference.child("EntryPrice").setValue(entryPrice)
                     firebaseReference.child("Category").setValue(category)
                 }
             }

@@ -136,12 +136,12 @@ class LocationPermission {
                 if (snapshot.exists()) {
                     snapshot.children.forEach {
                         //val id = it.value.toString().toLong()
-                        val latitude = it.child("Location").child("Latitude").value.toString().toDouble()
-                        val longitude = it.child("Location").child("Longitude").value.toString().toDouble()
+                        val latitude = it.child("Location").child("Latitude").getValue(Double::class.java)
+                        val longitude = it.child("Location").child("Longitude").getValue(Double::class.java)
                         val name = it.child("Name").value.toString()
                         val category = fromStringToCategory(it.child("Category").value.toString())
                         val description = it.child("Description").value.toString()
-                        //val entryPrice = it.child("EntryPrice").value.toString().toDouble()
+                        val entryPrice = it.child("EntryPrice").getValue(Double::class.java)
 
 //                        val site = Site(
 //                            id = id,
@@ -152,10 +152,12 @@ class LocationPermission {
 //                            description = description,
 //                            category = category
 //                        )
-                        map.addMarker(
-                            MarkerOptions().position(LatLng(latitude, longitude)).title(name)
-                                .icon(getMarkerIcon(category, context))
-                        )
+                        if (latitude != null && longitude != null) {
+                            map.addMarker(
+                                MarkerOptions().position(LatLng(latitude, longitude)).title(name)
+                                    .icon(getMarkerIcon(category, context))
+                            )
+                        }
                     }
                 }
             }
