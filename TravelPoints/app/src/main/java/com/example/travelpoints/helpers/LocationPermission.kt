@@ -135,7 +135,7 @@ class LocationPermission {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     snapshot.children.forEach {
-                        //val id = it.value.toString().toLong()
+                        val id = it.child("ID").getValue(Long::class.java)
                         val latitude = it.child("Location").child("Latitude").getValue(Double::class.java)
                         val longitude = it.child("Location").child("Longitude").getValue(Double::class.java)
                         val name = it.child("Name").value.toString()
