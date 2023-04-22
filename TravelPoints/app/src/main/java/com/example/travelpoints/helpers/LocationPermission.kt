@@ -11,7 +11,6 @@ import android.location.LocationManager
 import android.os.Looper
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import com.example.travelpoints.models.Site
 import com.example.travelpoints.models.fromStringToCategory
 import com.example.travelpoints.models.getMarkerIcon
 import com.example.travelpoints.util.drawableToBitmap
@@ -127,9 +126,9 @@ class LocationPermission {
         map.animateCamera(CameraUpdateFactory.zoomTo(12f))
 
 
-        getAllSites(map, context)
+        getAllSitesAndSetMarkers(map, context)
     }
-    private fun getAllSites(map: GoogleMap, context: Context) {
+    private fun getAllSitesAndSetMarkers(map: GoogleMap, context: Context) {
         val siteNumber = FirebaseDatabase.getInstance().getReference("Sites")
         siteNumber.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
