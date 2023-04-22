@@ -13,12 +13,12 @@
         android:visibility="visible"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="110dp"
-        android:layout_height="110dp"
+        android:layout_width="130dp"
+        android:layout_height="200dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:background="@color/white"
-        android:alpha="0.7"
+        android:alpha="0.6"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -28,7 +28,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginStart="5dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/park_drawable"
+                android:src="@drawable/ic_park"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
             </ImageView>
@@ -50,7 +50,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginStart="5dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/museum_drawable"
+                android:src="@drawable/ic_museum"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/park_icon">
             </ImageView>
@@ -73,7 +73,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginStart="5dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/monument_drawable"
+                android:src="@drawable/ic_monument"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/museum_icon">
             </ImageView>
@@ -89,6 +89,29 @@
                 android:gravity="center"
                 android:layout_marginStart="5dp">
             </TextView>
+
+        <ImageView
+            android:id="@+id/position_icon"
+            android:layout_width="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/current_location_drawable"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/monument_icon">
+        </ImageView>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="You are here"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="@id/position_icon"
+            app:layout_constraintBottom_toBottomOf="@id/position_icon"
+            app:layout_constraintStart_toEndOf="@id/position_icon"
+            android:gravity="center"
+            android:layout_marginStart="5dp">
+        </TextView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
