@@ -26,8 +26,6 @@ class MapFragmentViewModel: ViewModel() {
                         val longitude = it.child("Location").child("Longitude").getValue(Double::class.java)
                         val name = it.child("Name").value.toString()
                         val id = it.child("ID").getValue(Long::class.java)
-                        Log.d("Reparatii", id.toString())
-                        //val id = 0L
                         val entryPrice = it.child("EntryPrice").getValue(Double::class.java)
                         val description = it.child("Description").value.toString()
                         val category = fromStringToCategory(it.child("Category").value.toString())
