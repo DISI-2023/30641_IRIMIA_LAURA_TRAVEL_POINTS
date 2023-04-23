@@ -36,8 +36,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 
-class LocationPermission {
-
+class LocationPermission(
+    private val moveToUserLocation: (LatLng) -> Unit = {}
+) {
     fun instanceLocationRequest(locationRequest: LocationRequest) {
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         locationRequest.interval = 5000L
@@ -121,13 +122,12 @@ class LocationPermission {
 
         val marker = MarkerOptions().position(LatLng(a, b)).title("You are here").icon(bitmapDescriptor)
         map.addMarker(marker)
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(a, b),12f))
-        map.animateCamera(CameraUpdateFactory.zoomIn())
-        map.animateCamera(CameraUpdateFactory.zoomTo(12f))
 
+        moveToUserLocation(LatLng(a, b))
 
         getAllSitesAndSetMarkers(map, context)
     }
+
     private fun getAllSitesAndSetMarkers(map: GoogleMap, context: Context) {
         val siteNumber = FirebaseDatabase.getInstance().getReference("Sites")
         siteNumber.addValueEventListener(object : ValueEventListener {

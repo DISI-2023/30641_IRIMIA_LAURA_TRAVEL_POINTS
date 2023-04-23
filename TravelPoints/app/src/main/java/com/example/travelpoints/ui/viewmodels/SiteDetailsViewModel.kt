@@ -3,6 +3,7 @@ package com.example.travelpoints.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.travelpoints.models.Site
+import com.example.travelpoints.models.getActiveUserId
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -38,7 +39,7 @@ class SiteDetailsViewModel(
                     snapshot.children.forEach {
                         val siteId = it.child("SiteId").getValue(Long::class.java)
                         val userId = it.child("UserID").value.toString()
-                        if (siteId == site.id && userId == FirebaseAuth.getInstance().currentUser?.uid) {
+                        if (siteId == site.id && userId == getActiveUserId()) {
                             val rating = it.child("Rating").getValue(Int::class.java)
                             if (rating != null) {
                                 _currentRating.value = rating
@@ -64,9 +65,10 @@ class SiteDetailsViewModel(
                     snapshot.children.forEach {
                         val siteId = it.child("SiteId").getValue(Long::class.java)
                         val userId = it.child("UserID").value.toString()
-                        if (siteId == site.id && userId == FirebaseAuth.getInstance().currentUser?.uid) {
+                        if (siteId == site.id && userId == getActiveUserId()) {
                             ratingAlreadyExists = true
-                            firebaseReference.child(it.key.toString()).child("Rating").setValue(rating)
+                            firebaseReference.child(it.key.toString()).child("Rating")
+                                .setValue(rating)
                         }
                     }
                     if (!ratingAlreadyExists) {
@@ -91,7 +93,7 @@ class SiteDetailsViewModel(
                         FirebaseDatabase.getInstance().getReference("Ratings").child("$currentId")
                     firebaseReference.child("Rating").setValue(rating)
                     firebaseReference.child("UserID")
-                        .setValue(FirebaseAuth.getInstance().currentUser?.uid)
+                        .setValue(getActiveUserId())
                     firebaseReference.child("SiteId")
                         .setValue(site.id)
                     ratingsNumber.setValue(currentId)
@@ -105,7 +107,7 @@ class SiteDetailsViewModel(
 
     private fun getAverageRating() {
         val firebaseReference = FirebaseDatabase.getInstance().getReference("Ratings")
-        firebaseReference.addValueEventListener(object: ValueEventListener{
+        firebaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 var totalRatings = 0
                 var ratingsNumber = 0
@@ -116,7 +118,7 @@ class SiteDetailsViewModel(
                             val rating = it.child("Rating").getValue(Int::class.java)
                             if (rating != null) {
                                 totalRatings += rating
-                                ratingsNumber ++
+                                ratingsNumber++
                             }
                         }
                     }
@@ -132,22 +134,19 @@ class SiteDetailsViewModel(
 
     fun updateCurrentRating(rating: Int) {
         _currentRating.value = rating
+
     }
 
     private fun checkIfIsInWishlist() {
-        //TODO check firebase to see if current site is in the wishlist of the logged in user
-        val isInWishlistAccordingToFirebase = false
-
-        _isInWishlist.value = isInWishlistAccordingToFirebase
-    }
-
-    fun updateIsInWishlist(newValue: Boolean) {
-        _isInWishlist.value = newValue
-        val firebaseReference = FirebaseDatabase.getInstance().getReference("Wishlist")
+        val firebaseReference = FirebaseDatabase.getInstance().getReference("Wishlist").child(getActiveUserId().toString())
         firebaseReference.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-
+                if(snapshot.exists()) {
+                    snapshot.children.forEach {
+                        if (it.key == site.id.toString()) {
+                            _isInWishlist.value = it.getValue(Boolean::class.java) ?: false
+                        }
+                    }
                 }
             }
 
@@ -156,4 +155,32 @@ class SiteDetailsViewModel(
 
         })
     }
+
+    fun updateIsInWishlist(newValue: Boolean) {
+        _isInWishlist.value = newValue
+        val firebaseReference = FirebaseDatabase.getInstance().getReference("Wishlist").child(getActiveUserId().toString())
+        firebaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    if (newValue) {
+                        firebaseReference.child(site.id.toString()).setValue(true)
+                    } else {
+                        firebaseReference.child(site.id.toString()).setValue(false)
+                    }
+                } else {
+                    firebaseReference.setValue(0)
+                    if (newValue) {
+                        firebaseReference.child(site.id.toString()).setValue(true)
+                    } else {
+                        firebaseReference.child(site.id.toString()).setValue(false)
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+        })
+    }
+
 }

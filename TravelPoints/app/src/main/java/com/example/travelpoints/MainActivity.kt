@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.travelpoints.databinding.MainActivityLayoutBinding
 import com.example.travelpoints.ui.fragments.*
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
@@ -26,10 +27,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupFragmentNavigation() {
-        val accountFragment = AccountFragment(navigateToLoginFragment = {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, loginFragment).commit()
-        })
+        val accountFragment = AccountFragment(
+            navigateToLoginFragment = {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, loginFragment).commit()
+            }, navigateToSiteDetails = {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, mapFragment).commit()
+                mapFragment.siteToPositionAt = it
+            }
+        )
 
         mapFragment = MapFragment(navigateToSiteCreation = { lat, long ->
             val siteCreationFragment = SiteCreationFragment(
