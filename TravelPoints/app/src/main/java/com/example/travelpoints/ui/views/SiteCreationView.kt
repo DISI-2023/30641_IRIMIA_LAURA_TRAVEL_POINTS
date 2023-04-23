@@ -51,21 +51,26 @@ fun SiteCreationView(
 ) {
     BackHandler(onBack = onScreenClose)
     Scaffold(topBar = {
-        TopAppBar(title = {
-            Text(
-                text = "New Site",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start,
-                color = Color.White,
-                fontSize = 22.sp
-            )
-        }, backgroundColor = Color.Black, navigationIcon = {
-            IconButton(onClick = onScreenClose) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack, contentDescription = null
+        TopAppBar(
+            title = {
+                Text(
+                    text = "New site",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Start,
+                    color = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                    fontSize = 22.sp
                 )
-            }
-        })
+            },
+            backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
+            navigationIcon = {
+                IconButton(onClick = onScreenClose) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = null,
+                        tint = if (isSystemInDarkTheme()) Color.White else Color.Black
+                    )
+                }
+            })
     }) {
         LazyColumn(
             modifier = Modifier
@@ -79,6 +84,7 @@ fun SiteCreationView(
                 val focusManager = LocalFocusManager.current
 
                 var name by remember { mutableStateOf("") }
+
                 TextField(
                     modifier = Modifier.padding(vertical = 8.dp),
                     label = { Text(text = "Name") },

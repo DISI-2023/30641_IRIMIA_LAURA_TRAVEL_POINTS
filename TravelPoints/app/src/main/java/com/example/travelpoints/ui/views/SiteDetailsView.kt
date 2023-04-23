@@ -1,40 +1,49 @@
 package com.example.travelpoints.ui.views
 
-import android.util.Log
-import android.widget.RatingBar
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.travelpoints.models.Site
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import com.example.travelpoints.R
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.vectorResource
-import androidx.core.graphics.applyCanvas
+import com.example.travelpoints.models.Site
 import com.example.travelpoints.ui.viewmodels.SiteDetailsViewModel
 
 @Composable
@@ -46,16 +55,15 @@ fun SiteDetailsView(
 
     BackHandler(onBack = onScreenClose)
     Scaffold(topBar = {
-        TopAppBar(
-            title = {
-                Text(
-                    text = site.name,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Start,
-                    color = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                    fontSize = 22.sp
-                )
-            },
+        TopAppBar(title = {
+            Text(
+                text = site.name,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start,
+                color = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                fontSize = 22.sp
+            )
+        },
             backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
             navigationIcon = {
                 IconButton(onClick = onScreenClose) {
@@ -80,8 +88,7 @@ fun SiteDetailsView(
                 )
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -89,8 +96,7 @@ fun SiteDetailsView(
                     Text(text = site.description, color = textColor)
                 }
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -98,8 +104,7 @@ fun SiteDetailsView(
                     Text(text = site.entryPrice.toString(), color = textColor)
                 }
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -107,8 +112,7 @@ fun SiteDetailsView(
                     Text(text = site.category.toString(), color = textColor)
                 }
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -116,8 +120,7 @@ fun SiteDetailsView(
                     Text(text = site.latitude.toString(), color = textColor)
                 }
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -125,14 +128,12 @@ fun SiteDetailsView(
                     Text(text = site.longitude.toString(), color = textColor)
                 }
                 val currentRating = viewModel.currentRating.collectAsState()
-                RatingBar(
-                    currentRating = currentRating.value,
-                    saveRating = {
-                        viewModel.updateCurrentRating(it)
-                        viewModel.saveRatingToFirebase(it)
-                    }
-                )
+                RatingBar(currentRating = currentRating.value, saveRating = {
+                    viewModel.updateCurrentRating(it)
+                    viewModel.saveRatingToFirebase(it)
+                })
                 WishlistOption(viewModel)
+                CommentsSectionView(viewModel = viewModel, site = site)
             }
         }
     }
@@ -145,32 +146,27 @@ private fun RatingBar(
 ) {
     Row {
         StarImage(
-            index = 1,
-            currentRating = currentRating
+            index = 1, currentRating = currentRating
         ) {
             saveRating(it)
         }
         StarImage(
-            index = 2,
-            currentRating = currentRating
+            index = 2, currentRating = currentRating
         ) {
             saveRating(it)
         }
         StarImage(
-            index = 3,
-            currentRating = currentRating
+            index = 3, currentRating = currentRating
         ) {
             saveRating(it)
         }
         StarImage(
-            index = 4,
-            currentRating = currentRating
+            index = 4, currentRating = currentRating
         ) {
             saveRating(it)
         }
         StarImage(
-            index = 5,
-            currentRating = currentRating
+            index = 5, currentRating = currentRating
         ) {
             saveRating(it)
         }
@@ -179,21 +175,15 @@ private fun RatingBar(
 
 @Composable
 private fun StarImage(
-    index: Int,
-    currentRating: Int,
-    onClick: (Int) -> Unit
+    index: Int, currentRating: Int, onClick: (Int) -> Unit
 ) {
-    Image(
-        painter = if (currentRating >= index) painterResource(id = R.drawable.ic_star_full_2) else painterResource(
-            id = R.drawable.ic_star_empty_2
-        ),
-        contentDescription = null,
-        modifier = Modifier
-            .padding(end = 2.dp)
-            .clickable {
-                onClick(index)
-            }
-    )
+    Image(painter = if (currentRating >= index) painterResource(id = R.drawable.ic_star_full_2) else painterResource(
+        id = R.drawable.ic_star_empty_2
+    ), contentDescription = null, modifier = Modifier
+        .padding(end = 2.dp)
+        .clickable {
+            onClick(index)
+        })
 }
 
 @Composable
@@ -209,8 +199,7 @@ private fun SiteAverageRating(
         Image(
             painter = painterResource(id = R.drawable.ic_star_full_2),
             contentDescription = null,
-            modifier = Modifier
-                .padding(start = 2.dp)
+            modifier = Modifier.padding(start = 2.dp)
         )
     }
 }
@@ -241,4 +230,69 @@ private fun WishlistOption(
             )
         }
     }
+}
+
+@Composable
+private fun CommentsSectionView(viewModel: SiteDetailsViewModel, site: Site) {
+    val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
+    var input by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+    val comments = viewModel.comments.collectAsState()
+
+    Text(text = "Comments", fontSize = 22.sp, color = textColor, modifier = Modifier)
+    Column(
+    ) {
+        comments.value.forEach {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                shape = RoundedCornerShape(8.dp),
+                backgroundColor = Color.LightGray,
+            ) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                ) {
+                    Text(text = "By ${it.second}")
+                    Text(text = it.first, modifier = Modifier.padding(top = 10.dp))
+                }
+            }
+        }
+    }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextField(
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .weight(0.95f),
+            label = { Text(text = "Add a new comment") },
+            value = input,
+            shape = RoundedCornerShape(8.dp),
+            onValueChange = {
+                input = it
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = {
+                focusManager.clearFocus()
+            }),
+            colors = TextFieldDefaults.textFieldColors(
+                unfocusedIndicatorColor = Color.Transparent
+            )
+        )
+        IconButton(onClick = {
+            viewModel.addNewComment(input)
+            input = ""
+        }) {
+            Icon(
+                imageVector = Icons.Filled.Send,
+                contentDescription = null,
+                tint = MaterialTheme.colors.primary
+            )
+        }
+    }
+
 }

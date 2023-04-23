@@ -1,6 +1,5 @@
 package com.example.travelpoints.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.travelpoints.models.Site
 import com.example.travelpoints.models.getActiveUserId
@@ -25,10 +24,15 @@ class SiteDetailsViewModel(
     private val _isInWishlist: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInWishlist = _isInWishlist.asStateFlow()
 
+    private val _comments: MutableStateFlow<List<Pair<String, String>>> =
+        MutableStateFlow(emptyList())
+    val comments = _comments.asStateFlow()
+
     init {
         getRatingOfCurrentUser()
         getAverageRating()
         checkIfIsInWishlist()
+        getComments()
     }
 
     private fun getRatingOfCurrentUser() {
@@ -134,14 +138,60 @@ class SiteDetailsViewModel(
 
     fun updateCurrentRating(rating: Int) {
         _currentRating.value = rating
+    }
 
+    fun addNewComment(comment: String) {
+        val commentsNumber =
+            FirebaseDatabase.getInstance().getReference("CommentsNumber").child("ID")
+        commentsNumber.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val currentId = (snapshot.value as Long) + 1L
+                    val firebaseReference =
+                        FirebaseDatabase.getInstance().getReference("Comments").child("$currentId")
+                    firebaseReference.child("Comment").setValue(comment)
+                    firebaseReference.child("UserEmail")
+                        .setValue(FirebaseAuth.getInstance().currentUser?.email)
+                    firebaseReference.child("SiteId")
+                        .setValue(site.id)
+                    commentsNumber.setValue(currentId)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+
+    fun getComments() {
+        val firebaseReference = FirebaseDatabase.getInstance().getReference("Comments")
+        firebaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    _comments.value = listOf()
+                    snapshot.children.forEach { commentSnapshot ->
+                        val siteId = commentSnapshot.child("SiteId").getValue(Long::class.java)
+                        if (siteId == site.id) {
+                            val comment = commentSnapshot.child("Comment").value.toString()
+                            val email = commentSnapshot.child("UserEmail").value.toString()
+                            _comments.value += Pair(comment, email)
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+        })
     }
 
     private fun checkIfIsInWishlist() {
-        val firebaseReference = FirebaseDatabase.getInstance().getReference("Wishlist").child(getActiveUserId().toString())
-        firebaseReference.addListenerForSingleValueEvent(object: ValueEventListener{
+        val firebaseReference = FirebaseDatabase.getInstance().getReference("Wishlist")
+            .child(getActiveUserId().toString())
+        firebaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.exists()) {
+                if (snapshot.exists()) {
                     snapshot.children.forEach {
                         if (it.key == site.id.toString()) {
                             _isInWishlist.value = it.getValue(Boolean::class.java) ?: false
@@ -158,7 +208,8 @@ class SiteDetailsViewModel(
 
     fun updateIsInWishlist(newValue: Boolean) {
         _isInWishlist.value = newValue
-        val firebaseReference = FirebaseDatabase.getInstance().getReference("Wishlist").child(getActiveUserId().toString())
+        val firebaseReference = FirebaseDatabase.getInstance().getReference("Wishlist")
+            .child(getActiveUserId().toString())
         firebaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
