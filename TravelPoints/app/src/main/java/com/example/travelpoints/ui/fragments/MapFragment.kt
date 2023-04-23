@@ -23,7 +23,7 @@ import com.google.android.gms.maps.model.Marker
 
 class MapFragment(
     private val navigateToSiteCreation: (Double, Double) -> Unit,
-    private val navigateToSiteDetails: (Site) -> Unit
+    private val navigateToSiteDetails: (Site) -> Unit,
 ) : Fragment(),
     OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -34,6 +34,7 @@ class MapFragment(
     private val viewModel by lazy {
         ViewModelProvider(this)[MapFragmentViewModel::class.java]
     }
+    var siteToPositionAt: Site? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -86,13 +87,13 @@ class MapFragment(
                     binding.constraintLayout.visibility = View.INVISIBLE
                     binding.siteDetails.visibility = View.INVISIBLE
 
-                    val newList = mutableListOf<Pair<String, LatLng>>()
+                    val newList = mutableSetOf<Pair<String, LatLng>>()
                     viewModel.sites.value?.forEach {
                         if (it.name.lowercase().contains(newText.lowercase())) {
                             newList.add(Pair(it.name, LatLng(it.latitude, it.longitude)))
                         }
                     }
-                    adapter.dataList = newList
+                    adapter.dataList = newList.toList()
 
                 } else {
                     binding.recyclerView.visibility = View.INVISIBLE
@@ -107,7 +108,19 @@ class MapFragment(
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-        LocationPermission().getCurrentLocation(requireActivity(), locationRequest, map)
+
+        LocationPermission(
+            moveToUserLocation = {
+                if (siteToPositionAt == null) {
+                    moveToUserLocation(it)
+                } else {
+                    showSiteDetailsPopUp(siteToPositionAt!!)
+                    onSiteClicked(LatLng(siteToPositionAt!!.latitude, siteToPositionAt!!.longitude))
+                    siteToPositionAt = null
+
+                }
+            }
+        ).getCurrentLocation(requireActivity(), locationRequest, map)
 
         map.setOnMarkerClickListener(this)
 
@@ -141,11 +154,16 @@ class MapFragment(
         binding.seeMoreBtn.setOnClickListener { navigateToSiteDetails(site) }
     }
 
-
     private fun onSiteClicked(latLng: LatLng) {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13f))
         map.animateCamera(CameraUpdateFactory.zoomIn())
         map.animateCamera(CameraUpdateFactory.zoomTo(13f))
+    }
+
+    private fun moveToUserLocation(userLatLng: LatLng) {
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng,12f))
+        map.animateCamera(CameraUpdateFactory.zoomIn())
+        map.animateCamera(CameraUpdateFactory.zoomTo(12f))
     }
 
     override fun onStart() {

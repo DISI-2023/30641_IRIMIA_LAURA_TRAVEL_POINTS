@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import com.example.travelpoints.util.drawableToBitmap
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.firebase.auth.FirebaseAuth
 
 data class Site(
     val id: Long,
@@ -14,7 +15,11 @@ data class Site(
     val entryPrice: Double,
     val description: String,
     val category: Category
-)
+) {
+    companion object {
+        var allSites: List<Site>? = null
+    }
+}
 
 
 enum class Category {
@@ -31,6 +36,9 @@ fun fromStringToCategory(string: String): Category {
         else -> Category.Monument
     }
 }
+
+fun getActiveUserId(): String? =
+    FirebaseAuth.getInstance().currentUser?.uid
 
 fun getMarkerIcon(category: Category, context: Context): BitmapDescriptor {
     val identifier = when(category){

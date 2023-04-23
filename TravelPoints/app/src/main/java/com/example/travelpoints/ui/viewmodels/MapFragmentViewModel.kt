@@ -45,6 +45,7 @@ class MapFragmentViewModel: ViewModel() {
 
                     }
                     sites.postValue(newSites)
+                    Site.allSites = newSites
                 }
             }
             override fun onCancelled(error: DatabaseError) {
