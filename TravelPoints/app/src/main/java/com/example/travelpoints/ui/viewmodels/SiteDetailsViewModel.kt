@@ -21,9 +21,13 @@ class SiteDetailsViewModel(
     private val _averageRating: MutableStateFlow<Float> = MutableStateFlow(0f)
     val averageRating = _averageRating.asStateFlow()
 
+    private val _isInWishlist: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isInWishlist = _isInWishlist.asStateFlow()
+
     init {
         getRatingOfCurrentUser()
         getAverageRating()
+        checkIfIsInWishlist()
     }
 
     private fun getRatingOfCurrentUser() {
@@ -72,7 +76,6 @@ class SiteDetailsViewModel(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
 
         })
@@ -96,7 +99,6 @@ class SiteDetailsViewModel(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
         })
     }
@@ -123,7 +125,6 @@ class SiteDetailsViewModel(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
 
         })
@@ -131,5 +132,28 @@ class SiteDetailsViewModel(
 
     fun updateCurrentRating(rating: Int) {
         _currentRating.value = rating
+    }
+
+    private fun checkIfIsInWishlist() {
+        //TODO check firebase to see if current site is in the wishlist of the logged in user
+        val isInWishlistAccordingToFirebase = false
+
+        _isInWishlist.value = isInWishlistAccordingToFirebase
+    }
+
+    fun updateIsInWishlist(newValue: Boolean) {
+        _isInWishlist.value = newValue
+        val firebaseReference = FirebaseDatabase.getInstance().getReference("Wishlist")
+        firebaseReference.addListenerForSingleValueEvent(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+        })
     }
 }

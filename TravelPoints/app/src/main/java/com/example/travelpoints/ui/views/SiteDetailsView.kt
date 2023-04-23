@@ -3,6 +3,7 @@ package com.example.travelpoints.ui.views
 import android.util.Log
 import android.widget.RatingBar
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
@@ -74,6 +75,10 @@ fun SiteDetailsView(
             item {
                 val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
 
+                SiteAverageRating(
+                    rating = viewModel.averageRating.collectAsState().value
+                )
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -127,9 +132,7 @@ fun SiteDetailsView(
                         viewModel.saveRatingToFirebase(it)
                     }
                 )
-                SiteAverageRating(
-                    rating = viewModel.averageRating.collectAsState().value
-                )
+                WishlistOption(viewModel)
             }
         }
     }
@@ -140,7 +143,6 @@ private fun RatingBar(
     currentRating: Int,
     saveRating: (Int) -> Unit,
 ) {
-
     Row {
         StarImage(
             index = 1,
@@ -210,5 +212,33 @@ private fun SiteAverageRating(
             modifier = Modifier
                 .padding(start = 2.dp)
         )
+    }
+}
+
+@Composable
+private fun WishlistOption(
+    viewModel: SiteDetailsViewModel
+) {
+    val isInWishlist = viewModel.isInWishlist.collectAsState()
+
+    OutlinedButton(
+        onClick = { viewModel.updateIsInWishlist(!isInWishlist.value) },
+        border = BorderStroke(1.dp, Color.Red)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = if (isInWishlist.value) painterResource(id = R.drawable.ic_heart_full) else painterResource(
+                    id = R.drawable.ic_heart_empty
+                ), contentDescription = null
+            )
+            Text(
+                text = if (isInWishlist.value) "Added to Wishlist" else "Add to Wishlist",
+                color = Color.Red,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
     }
 }
