@@ -134,23 +134,11 @@ class LocationPermission {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     snapshot.children.forEach {
-                        val id = it.child("ID").getValue(Long::class.java)
                         val latitude = it.child("Location").child("Latitude").getValue(Double::class.java)
                         val longitude = it.child("Location").child("Longitude").getValue(Double::class.java)
                         val name = it.child("Name").value.toString()
                         val category = fromStringToCategory(it.child("Category").value.toString())
-                        val description = it.child("Description").value.toString()
-                        val entryPrice = it.child("EntryPrice").getValue(Double::class.java)
 
-//                        val site = Site(
-//                            id = id,
-//                            name = name,
-//                            latitude = latitude,
-//                            longitude = longitude,
-//                            entryPrice = entryPrice,
-//                            description = description,
-//                            category = category
-//                        )
                         if (latitude != null && longitude != null) {
                             map.addMarker(
                                 MarkerOptions().position(LatLng(latitude, longitude)).title(name)

@@ -1,13 +1,10 @@
 package com.example.travelpoints.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.compose.ui.text.toLowerCase
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,7 +20,6 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
-import java.util.*
 
 class MapFragment(
     private val navigateToSiteCreation: (Double, Double) -> Unit,
@@ -72,6 +68,12 @@ class MapFragment(
             }
         }
 
+        binding.closeBtn.setOnClickListener {
+            binding.constraintLayout.visibility = View.VISIBLE
+            binding.siteDetails.visibility = View.INVISIBLE
+            binding.recyclerView.visibility = View.INVISIBLE
+        }
+
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 // Handle search query submission
@@ -80,8 +82,10 @@ class MapFragment(
 
             override fun onQueryTextChange(newText: String): Boolean {
                 if (newText.isNotEmpty() && newText.isNotBlank()) {
-                    binding.recyclerView.isVisible = true
-                    binding.constraintLayout.isVisible = false
+                    binding.recyclerView.visibility = View.VISIBLE
+                    binding.constraintLayout.visibility = View.INVISIBLE
+                    binding.siteDetails.visibility = View.INVISIBLE
+
                     val newList = mutableListOf<Pair<String, LatLng>>()
                     viewModel.sites.value?.forEach {
                         if (it.name.lowercase().contains(newText.lowercase())) {
@@ -91,9 +95,9 @@ class MapFragment(
                     adapter.dataList = newList
 
                 } else {
-                    binding.recyclerView.isVisible = false
-                    binding.constraintLayout.isVisible = true
-
+                    binding.recyclerView.visibility = View.INVISIBLE
+                    binding.constraintLayout.visibility = View.VISIBLE
+                    binding.siteDetails.visibility = View.INVISIBLE
                 }
 
                 return false
@@ -118,13 +122,24 @@ class MapFragment(
         viewModel.sites.observe(viewLifecycleOwner) { sites ->
             sites?.forEach {
                 if (p0.position.latitude == it.latitude && p0.position.longitude == it.longitude) {
-                    navigateToSiteDetails(it)
+                    showSiteDetailsPopUp(it)
                 }
             }
         }
         return true
     }
 
+    private fun showSiteDetailsPopUp(site: Site) {
+        binding.siteNameTv.text = site.name
+        binding.descriptionTv.text = site.description
+        binding.entryPriceTv.text = site.entryPrice.toString()
+
+        binding.constraintLayout.visibility = View.INVISIBLE
+        binding.siteDetails.visibility = View.VISIBLE
+        binding.recyclerView.visibility = View.INVISIBLE
+
+        binding.seeMoreBtn.setOnClickListener { navigateToSiteDetails(site) }
+    }
 
 
     private fun onSiteClicked(latLng: LatLng) {
