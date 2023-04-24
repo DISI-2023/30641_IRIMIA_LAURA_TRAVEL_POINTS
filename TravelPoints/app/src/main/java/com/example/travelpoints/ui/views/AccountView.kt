@@ -1,10 +1,7 @@
 package com.example.travelpoints.ui.views
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -34,6 +31,22 @@ fun AccountView(
     ) {
         val wishlistSites = viewModel.wishlistSites.collectAsState()
 
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            Text(
+                text = "Logged in as:    ",
+                fontSize = 22.sp,
+                color = Color.Black
+            )
+            Text(
+                text = FirebaseAuth.getInstance().currentUser?.email.toString(),
+                fontSize = 22.sp,
+                color = MaterialTheme.colors.primary
+            )
+        }
         Text(
             modifier = Modifier
                 .fillMaxWidth()

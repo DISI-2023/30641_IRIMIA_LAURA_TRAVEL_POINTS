@@ -198,11 +198,16 @@ class SiteDetailsViewModel(
             .child(getActiveUserId().toString())
         firebaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                var siteFound = false
                 if (snapshot.exists()) {
                     snapshot.children.forEach {
                         if (it.key == site.id.toString()) {
                             _isInWishlist.value = it.getValue(Boolean::class.java) ?: false
+                            siteFound = true
                         }
+                    }
+                    if (!siteFound) {
+                        _isInWishlist.value = false
                     }
                 }
             }
