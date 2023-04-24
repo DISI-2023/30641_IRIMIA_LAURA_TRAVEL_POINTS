@@ -12,6 +12,7 @@ import com.example.travelpoints.adapters.SearchViewAdapter
 import com.example.travelpoints.databinding.FragmentMapBinding
 import com.example.travelpoints.helpers.LocationPermission
 import com.example.travelpoints.models.Site
+import com.example.travelpoints.models.isCurrentUserAdmin
 import com.example.travelpoints.ui.viewmodels.MapFragmentViewModel
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -126,7 +127,7 @@ class MapFragment(
         map.setOnMarkerClickListener(this)
 
         map.setOnMapLongClickListener {
-            if (FirebaseAuth.getInstance().currentUser?.uid.equals("LWtquFDJ0MWlXqTc6ZsukLAklvb2")) {
+            if (isCurrentUserAdmin()) {
                 navigateToSiteCreation(it.latitude, it.longitude)
             }
         }

@@ -40,6 +40,9 @@ fun fromStringToCategory(string: String): Category {
 fun getActiveUserId(): String? =
     FirebaseAuth.getInstance().currentUser?.uid
 
+fun isCurrentUserAdmin(): Boolean =
+    FirebaseAuth.getInstance().currentUser?.email == "admin@gmail.com"
+
 fun getMarkerIcon(category: Category, context: Context): BitmapDescriptor {
     val identifier = when(category){
         Category.Park -> "ic_park"
