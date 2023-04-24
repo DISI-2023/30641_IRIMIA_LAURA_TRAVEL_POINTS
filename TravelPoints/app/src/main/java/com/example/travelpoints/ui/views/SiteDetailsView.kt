@@ -1,5 +1,7 @@
 package com.example.travelpoints.ui.views
 
+import android.content.Context
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -36,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -50,6 +53,7 @@ import com.example.travelpoints.ui.viewmodels.SiteDetailsViewModel
 fun SiteDetailsView(
     site: Site,
     viewModel: SiteDetailsViewModel = SiteDetailsViewModel(site),
+    userIsLoggedIn: Boolean,
     onScreenClose: () -> Unit
 ) {
 
@@ -84,7 +88,8 @@ fun SiteDetailsView(
                 val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
 
                 SiteAverageRating(
-                    rating = viewModel.averageRating.collectAsState().value
+                    rating = viewModel.averageRating.collectAsState().value,
+                    ratingsNumber = viewModel.ratingsNumber.collectAsState().value
                 )
 
                 Row(
@@ -128,12 +133,17 @@ fun SiteDetailsView(
                     Text(text = site.longitude.toString(), color = textColor)
                 }
                 val currentRating = viewModel.currentRating.collectAsState()
+                val context = LocalContext.current
                 RatingBar(currentRating = currentRating.value, saveRating = {
-                    viewModel.updateCurrentRating(it)
-                    viewModel.saveRatingToFirebase(it)
+                    if (userIsLoggedIn) {
+                        viewModel.updateCurrentRating(it)
+                        viewModel.saveRatingToFirebase(it)
+                    } else {
+                        showLoginToast(context)
+                    }
                 })
-                WishlistOption(viewModel)
-                CommentsSectionView(viewModel = viewModel, site = site)
+                WishlistOption(viewModel, userIsLoggedIn)
+                CommentsSectionView(viewModel = viewModel, userIsLoggedIn = userIsLoggedIn)
             }
         }
     }
@@ -188,7 +198,8 @@ private fun StarImage(
 
 @Composable
 private fun SiteAverageRating(
-    rating: Float
+    rating: Float,
+    ratingsNumber: Int
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -201,17 +212,27 @@ private fun SiteAverageRating(
             contentDescription = null,
             modifier = Modifier.padding(start = 2.dp)
         )
+        Text(
+            text = "($ratingsNumber reviews)"
+        )
     }
 }
 
 @Composable
 private fun WishlistOption(
-    viewModel: SiteDetailsViewModel
+    viewModel: SiteDetailsViewModel,
+    userIsLoggedIn: Boolean
 ) {
     val isInWishlist = viewModel.isInWishlist.collectAsState()
-
+    val context = LocalContext.current
     OutlinedButton(
-        onClick = { viewModel.updateIsInWishlist(!isInWishlist.value) },
+        onClick = {
+            if (userIsLoggedIn) {
+                viewModel.updateIsInWishlist(!isInWishlist.value)
+            } else {
+                showLoginToast(context)
+            }
+        },
         border = BorderStroke(1.dp, Color.Red)
     ) {
         Row(
@@ -233,7 +254,10 @@ private fun WishlistOption(
 }
 
 @Composable
-private fun CommentsSectionView(viewModel: SiteDetailsViewModel, site: Site) {
+private fun CommentsSectionView(
+    viewModel: SiteDetailsViewModel,
+    userIsLoggedIn: Boolean
+) {
     val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
     var input by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
@@ -283,9 +307,14 @@ private fun CommentsSectionView(viewModel: SiteDetailsViewModel, site: Site) {
                 unfocusedIndicatorColor = Color.Transparent
             )
         )
+        val context = LocalContext.current
         IconButton(onClick = {
-            viewModel.addNewComment(input)
-            input = ""
+            if (userIsLoggedIn) {
+                viewModel.addNewComment(input)
+                input = ""
+            } else {
+                showLoginToast(context)
+            }
         }) {
             Icon(
                 imageVector = Icons.Filled.Send,
@@ -294,5 +323,8 @@ private fun CommentsSectionView(viewModel: SiteDetailsViewModel, site: Site) {
             )
         }
     }
+}
 
+private fun showLoginToast(context: Context) {
+    Toast.makeText(context, "You must be logged in to interact", Toast.LENGTH_SHORT).show()
 }

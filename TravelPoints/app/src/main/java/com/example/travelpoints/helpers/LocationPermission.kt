@@ -149,7 +149,6 @@ class LocationPermission(
                 }
             }
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
         })
     }

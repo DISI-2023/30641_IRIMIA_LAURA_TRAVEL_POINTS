@@ -20,6 +20,7 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.google.firebase.auth.FirebaseAuth
 
 class MapFragment(
     private val navigateToSiteCreation: (Double, Double) -> Unit,
@@ -125,9 +126,9 @@ class MapFragment(
         map.setOnMarkerClickListener(this)
 
         map.setOnMapLongClickListener {
-            //TODO allow site creation only if logged in user is ADMIN
-            //if (FirebaseAuth.getInstance().currentUser?.uid.equals("LWtquFDJ0MWlXqTc6ZsukLAklvb2")) {
-            navigateToSiteCreation(it.latitude, it.longitude)
+            if (FirebaseAuth.getInstance().currentUser?.uid.equals("LWtquFDJ0MWlXqTc6ZsukLAklvb2")) {
+                navigateToSiteCreation(it.latitude, it.longitude)
+            }
         }
     }
 

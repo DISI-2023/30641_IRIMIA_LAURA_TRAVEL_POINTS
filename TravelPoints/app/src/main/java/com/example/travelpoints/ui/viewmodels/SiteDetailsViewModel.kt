@@ -21,6 +21,9 @@ class SiteDetailsViewModel(
     private val _averageRating: MutableStateFlow<Float> = MutableStateFlow(0f)
     val averageRating = _averageRating.asStateFlow()
 
+    private val _ratingsNumber: MutableStateFlow<Int> = MutableStateFlow(0)
+    val ratingsNumber = _ratingsNumber.asStateFlow()
+
     private val _isInWishlist: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInWishlist = _isInWishlist.asStateFlow()
 
@@ -54,7 +57,6 @@ class SiteDetailsViewModel(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
 
         })
@@ -127,7 +129,12 @@ class SiteDetailsViewModel(
                         }
                     }
                 }
-                _averageRating.value = totalRatings.toFloat() / ratingsNumber.toFloat()
+                _ratingsNumber.value = ratingsNumber
+                if (ratingsNumber == 0) {
+                    _averageRating.value = 0f
+                } else {
+                    _averageRating.value = totalRatings.toFloat() / ratingsNumber.toFloat()
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {

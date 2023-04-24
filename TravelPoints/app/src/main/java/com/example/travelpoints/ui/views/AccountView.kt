@@ -1,23 +1,25 @@
 package com.example.travelpoints.ui.views
 
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.travelpoints.models.Site
 import com.example.travelpoints.ui.viewmodels.AccountViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
 
 @Composable
 fun AccountView(
@@ -48,7 +50,10 @@ fun AccountView(
             shape = RoundedCornerShape(8.dp)
         ) {
             LazyColumn(
-                modifier = Modifier.weight(0.8f).padding(8.dp)) {
+                modifier = Modifier
+                    .weight(0.8f)
+                    .padding(8.dp)
+            ) {
                 item {
                     wishlistSites.value.forEach {
                         OutlinedButton(onClick = { navigateToSiteDetails(it) }) {
@@ -64,8 +69,7 @@ fun AccountView(
             onClick = {
                 FirebaseAuth.getInstance().signOut()
                 navigateToLoginFragment()
-            },
-            modifier = Modifier
+            }, modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
         ) {
