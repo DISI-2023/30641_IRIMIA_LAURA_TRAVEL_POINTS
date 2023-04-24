@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupFragmentNavigation() {
+        val bottomBar = binding.bottomNavigationView
+
         val accountFragment = AccountFragment(
             navigateToLoginFragment = {
                 supportFragmentManager.beginTransaction()
@@ -34,6 +36,7 @@ class MainActivity : AppCompatActivity() {
             }, navigateToSiteDetails = {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, mapFragment).commit()
+                bottomBar.selectedItemId = R.id.map
                 mapFragment.siteToPositionAt = it
             }
         )
@@ -80,9 +83,6 @@ class MainActivity : AppCompatActivity() {
                     .replace(R.id.fragment_container, accountFragment).commit()
             }
         )
-
-
-        val bottomBar = binding.bottomNavigationView
 
         bottomBar.selectedItemId = R.id.map
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, mapFragment)
