@@ -83,6 +83,7 @@ class MainActivity : AppCompatActivity() {
                     .replace(R.id.fragment_container, accountFragment).commit()
             }
         )
+        val chartsFragment = ChartsFragment()
 
         bottomBar.selectedItemId = R.id.map
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, mapFragment)
@@ -109,6 +110,11 @@ class MainActivity : AppCompatActivity() {
                 R.id.support -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, supportFragment)
+                        .commit()
+                }
+                R.id.charts -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, chartsFragment)
                         .commit()
                 }
             }
