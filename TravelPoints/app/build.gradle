@@ -76,6 +76,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'androidx.fragment:fragment-ktx:1.5.7'
 
+    //push notifications
+    implementation 'com.google.firebase:firebase-messaging:23.1.2'
+    implementation 'com.android.volley:volley:1.2.1'
+
+    //charts
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
 

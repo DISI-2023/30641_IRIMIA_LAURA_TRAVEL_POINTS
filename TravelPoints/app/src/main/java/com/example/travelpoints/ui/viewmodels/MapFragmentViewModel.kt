@@ -1,11 +1,21 @@
 package com.example.travelpoints.ui.viewmodels
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.travelpoints.R
 import com.example.travelpoints.models.Site
 import com.example.travelpoints.models.fromStringToCategory
+import com.example.travelpoints.models.getActiveUserId
+import com.example.travelpoints.models.isCurrentUserAdmin
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
