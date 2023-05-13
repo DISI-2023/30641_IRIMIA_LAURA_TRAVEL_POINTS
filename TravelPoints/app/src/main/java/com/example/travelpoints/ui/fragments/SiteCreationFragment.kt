@@ -58,6 +58,7 @@ class SiteCreationFragment(
                     firebaseReference.child("Name").setValue(name)
                     firebaseReference.child("Description").setValue(description)
                     firebaseReference.child("EntryPrice").setValue(entryPrice)
+                    firebaseReference.child("OfferValue").setValue(0.0)
                     firebaseReference.child("Category").setValue(category)
 
                     siteNumber.setValue(currentId)

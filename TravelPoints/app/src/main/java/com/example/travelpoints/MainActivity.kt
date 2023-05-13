@@ -5,12 +5,17 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
 import com.example.travelpoints.databinding.MainActivityLayoutBinding
-import com.example.travelpoints.ui.fragments.*
-import com.google.android.gms.maps.model.LatLng
+import com.example.travelpoints.ui.fragments.AccountFragment
+import com.example.travelpoints.ui.fragments.ChartsFragment
+import com.example.travelpoints.ui.fragments.LoginFragment
+import com.example.travelpoints.ui.fragments.MapFragment
+import com.example.travelpoints.ui.fragments.RegisterFragment
+import com.example.travelpoints.ui.fragments.SiteCreationFragment
+import com.example.travelpoints.ui.fragments.SiteDetailsFragment
+import com.example.travelpoints.ui.fragments.SupportFragment
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
@@ -45,7 +50,8 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        mapFragment = MapFragment(navigateToSiteCreation = { lat, long ->
+        mapFragment = MapFragment(
+            navigateToSiteCreation = { lat, long ->
             val siteCreationFragment = SiteCreationFragment(
                 lat = lat,
                 long = long,
@@ -106,11 +112,13 @@ class MainActivity : AppCompatActivity() {
                             .commit()
                     }
                 }
+
                 R.id.map -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, mapFragment)
                         .commit()
                 }
+
                 R.id.support -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, supportFragment)

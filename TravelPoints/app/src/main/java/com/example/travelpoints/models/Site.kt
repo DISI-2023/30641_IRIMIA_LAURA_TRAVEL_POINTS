@@ -14,7 +14,8 @@ data class Site(
     val longitude: Double,
     val entryPrice: Double,
     val description: String,
-    val category: Category
+    val category: Category,
+    var offerValue: Double
 ) {
     companion object {
         var allSites: List<Site>? = null

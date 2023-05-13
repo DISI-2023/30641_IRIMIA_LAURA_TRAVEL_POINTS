@@ -27,6 +27,9 @@ class SiteDetailsViewModel(
     private val _isInWishlist: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInWishlist = _isInWishlist.asStateFlow()
 
+    private val _entryPrice: MutableStateFlow<Double> = MutableStateFlow(site.entryPrice)
+    val entryPrice = _entryPrice.asStateFlow()
+
     private val _comments: MutableStateFlow<List<Pair<String, String>>> =
         MutableStateFlow(emptyList())
     val comments = _comments.asStateFlow()
@@ -98,10 +101,8 @@ class SiteDetailsViewModel(
                     val firebaseReference =
                         FirebaseDatabase.getInstance().getReference("Ratings").child("$currentId")
                     firebaseReference.child("Rating").setValue(rating)
-                    firebaseReference.child("UserID")
-                        .setValue(getActiveUserId())
-                    firebaseReference.child("SiteId")
-                        .setValue(site.id)
+                    firebaseReference.child("UserID").setValue(getActiveUserId())
+                    firebaseReference.child("SiteId").setValue(site.id)
                     ratingsNumber.setValue(currentId)
                 }
             }
@@ -159,8 +160,7 @@ class SiteDetailsViewModel(
                     firebaseReference.child("Comment").setValue(comment)
                     firebaseReference.child("UserEmail")
                         .setValue(FirebaseAuth.getInstance().currentUser?.email)
-                    firebaseReference.child("SiteId")
-                        .setValue(site.id)
+                    firebaseReference.child("SiteId").setValue(site.id)
                     commentsNumber.setValue(currentId)
                 }
             }
@@ -244,6 +244,14 @@ class SiteDetailsViewModel(
             }
 
         })
+    }
+
+    fun updateOfferValue(newValue: Double) {
+
+        val firebaseReference = FirebaseDatabase.getInstance().getReference("Sites")
+        firebaseReference.child(site.id.toString()).child("OfferValue").setValue(newValue)
+        site.offerValue = newValue
+        _entryPrice.value = site.entryPrice - site.entryPrice * newValue
     }
 
 }
