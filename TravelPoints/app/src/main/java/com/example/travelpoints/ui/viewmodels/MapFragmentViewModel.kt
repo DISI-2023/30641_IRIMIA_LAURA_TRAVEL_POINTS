@@ -29,6 +29,7 @@ class MapFragmentViewModel: ViewModel() {
                         val entryPrice = it.child("EntryPrice").getValue(Double::class.java)
                         val description = it.child("Description").value.toString()
                         val category = fromStringToCategory(it.child("Category").value.toString())
+                        val offerValue = it.child("OfferValue").getValue(Double::class.java) ?: 0.0
 
                         if(latitude!=null && longitude!=null && name!=null && id!=null && entryPrice!=null && description!=null && category!=null){
                             val newSite = Site(
@@ -36,9 +37,10 @@ class MapFragmentViewModel: ViewModel() {
                                 name,
                                 latitude,
                                 longitude,
-                                entryPrice,
+                                entryPrice - offerValue.times(entryPrice),
                                 description,
-                                category
+                                category,
+                                offerValue
                             )
                             newSites.add(newSite)
                         }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -23,6 +24,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
@@ -41,12 +43,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.travelpoints.R
 import com.example.travelpoints.models.Site
+import com.example.travelpoints.models.isCurrentUserAdmin
 import com.example.travelpoints.ui.viewmodels.SiteDetailsViewModel
 
 @Composable
@@ -56,6 +62,7 @@ fun SiteDetailsView(
     userIsLoggedIn: Boolean,
     onScreenClose: () -> Unit
 ) {
+    val entryPrice by viewModel.entryPrice.collectAsState()
 
     BackHandler(onBack = onScreenClose)
     Scaffold(topBar = {
@@ -105,14 +112,6 @@ fun SiteDetailsView(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "EntryPrice:", color = textColor)
-                    Text(text = site.entryPrice.toString(), color = textColor)
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
                     Text(text = "Category:", color = textColor)
                     Text(text = site.category.toString(), color = textColor)
                 }
@@ -132,6 +131,36 @@ fun SiteDetailsView(
                     Text(text = "Longitude:", color = textColor)
                     Text(text = site.longitude.toString(), color = textColor)
                 }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "EntryPrice:", color = textColor)
+                    Row(
+                        horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (site.offerValue != 0.0) {
+                            Text(
+                                text = entryPrice.toFloat().toString(),
+                                color = Color.Red,
+                                modifier = Modifier.padding(horizontal = 5.dp),
+                            )
+                            Text(
+                                text = site.entryPrice.toString(),
+                                color = textColor,
+                                modifier = Modifier.padding(horizontal = 5.dp),
+                                style = TextStyle(textDecoration = TextDecoration.LineThrough)
+                            )
+                        } else {
+                            Text(
+                                text = entryPrice.toFloat().toString(),
+                                color = textColor,
+                                modifier = Modifier.padding(horizontal = 5.dp),
+                            )
+                        }
+                    }
+                }
                 val currentRating = viewModel.currentRating.collectAsState()
                 val context = LocalContext.current
                 RatingBar(currentRating = currentRating.value, saveRating = {
@@ -143,6 +172,11 @@ fun SiteDetailsView(
                     }
                 })
                 WishlistOption(viewModel, userIsLoggedIn)
+                if (isCurrentUserAdmin()) {
+                    ApplyOffer(site, updateOfferValue = { newValue ->
+                        viewModel.updateOfferValue(newValue)
+                    })
+                }
                 CommentsSectionView(viewModel = viewModel, userIsLoggedIn = userIsLoggedIn)
             }
         }
@@ -198,8 +232,7 @@ private fun StarImage(
 
 @Composable
 private fun SiteAverageRating(
-    rating: Float,
-    ratingsNumber: Int
+    rating: Float, ratingsNumber: Int
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -220,8 +253,7 @@ private fun SiteAverageRating(
 
 @Composable
 private fun WishlistOption(
-    viewModel: SiteDetailsViewModel,
-    userIsLoggedIn: Boolean
+    viewModel: SiteDetailsViewModel, userIsLoggedIn: Boolean
 ) {
     val isInWishlist = viewModel.isInWishlist.collectAsState()
     val context = LocalContext.current
@@ -232,8 +264,7 @@ private fun WishlistOption(
             } else {
                 showLoginToast(context)
             }
-        },
-        border = BorderStroke(1.dp, Color.Red)
+        }, border = BorderStroke(1.dp, Color.Red)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -255,8 +286,7 @@ private fun WishlistOption(
 
 @Composable
 private fun CommentsSectionView(
-    viewModel: SiteDetailsViewModel,
-    userIsLoggedIn: Boolean
+    viewModel: SiteDetailsViewModel, userIsLoggedIn: Boolean
 ) {
     val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
     var input by remember { mutableStateOf("") }
@@ -322,6 +352,60 @@ private fun CommentsSectionView(
                 tint = MaterialTheme.colors.primary
             )
         }
+    }
+}
+
+@Composable
+fun ApplyOffer(site: Site, updateOfferValue: (Double) -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+    var input by remember { mutableStateOf((site.offerValue * 100).toInt().toString()) }
+    val focusManager = LocalFocusManager.current
+
+    OutlinedButton(onClick = { showDialog = true }) {
+        Text(text = "Apply offer to this site")
+    }
+    if (showDialog) {
+        AlertDialog(onDismissRequest = { showDialog = false }, text = {
+            TextField(modifier = Modifier.padding(vertical = 8.dp),
+                label = { Text(text = "Specify the discount percentage", fontSize = 16.sp) },
+                value = input,
+                shape = RoundedCornerShape(8.dp),
+                onValueChange = {
+                    if (it.toIntOrNull() != null && it.length<4) {
+                        if (it.toInt() <= 100) {
+                            input = it
+                        }
+                    }
+                    if (it.isEmpty()) {
+                        input = it
+                    }
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done, keyboardType = KeyboardType.Decimal,
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    focusManager.clearFocus()
+                }),
+                colors = TextFieldDefaults.textFieldColors(
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                trailingIcon = { Text(text = "%") })
+        }, buttons = {
+            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                TextButton(
+                    onClick = { showDialog = false }, modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text(text = "Cancel")
+                }
+                TextButton(onClick = {
+                    val newOfferValue = (input.toInt().toDouble() / 100)
+                    updateOfferValue(newOfferValue)
+                    showDialog = false
+                }) {
+                    Text(text = "Done")
+                }
+            }
+        })
     }
 }
 
