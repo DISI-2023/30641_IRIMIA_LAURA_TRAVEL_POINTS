@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.travelpoints.MainActivity
 import com.example.travelpoints.models.Site
 import com.example.travelpoints.models.getActiveUserEmail
 import com.example.travelpoints.ui.viewmodels.AccountViewModel
@@ -82,6 +83,7 @@ fun AccountView(
         OutlinedButton(
             onClick = {
                 FirebaseAuth.getInstance().signOut()
+                MainActivity.eventLiveData.postValue(Unit)
                 navigateToLoginFragment()
             }, modifier = Modifier
                 .fillMaxWidth()

@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.example.travelpoints.MainActivity
 import com.example.travelpoints.R
 import com.example.travelpoints.databinding.FragmentRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -72,6 +73,7 @@ class RegisterFragment(
                     Toast.makeText(requireContext(), "Account created", Toast.LENGTH_SHORT).show()
                     Log.d("success", "blabla")
                     navigateToAccountFragment()
+                    MainActivity.eventLiveData.postValue(Unit)
                 } else {
                     Log.d("fail", "blabla")
                     Toast.makeText(requireContext(), "Account not created ${task.exception?.message}", Toast.LENGTH_SHORT).show()

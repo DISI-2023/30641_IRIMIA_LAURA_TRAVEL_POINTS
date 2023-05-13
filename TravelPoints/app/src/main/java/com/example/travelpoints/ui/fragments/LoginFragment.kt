@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.example.travelpoints.MainActivity
 import com.example.travelpoints.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 
@@ -66,6 +67,7 @@ class LoginFragment(
                 if (task.isSuccessful) {
                     Toast.makeText(requireActivity(), "Successfully logged in", Toast.LENGTH_SHORT).show()
                     navigateToAccountFragment()
+                    MainActivity.eventLiveData.postValue(Unit)
                 } else {
                     Toast.makeText(requireActivity(), "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
