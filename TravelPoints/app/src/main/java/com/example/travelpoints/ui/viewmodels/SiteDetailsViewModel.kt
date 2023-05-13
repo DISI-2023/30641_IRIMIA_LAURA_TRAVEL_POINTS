@@ -27,8 +27,8 @@ class SiteDetailsViewModel(
     private val _isInWishlist: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInWishlist = _isInWishlist.asStateFlow()
 
-    private val _entryPrice: MutableStateFlow<Double> = MutableStateFlow(site.entryPrice)
-    val entryPrice = _entryPrice.asStateFlow()
+    private val _offerValue: MutableStateFlow<Double> = MutableStateFlow(site.offerValue)
+    val offerValue = _offerValue.asStateFlow()
 
     private val _comments: MutableStateFlow<List<Pair<String, String>>> =
         MutableStateFlow(emptyList())
@@ -250,8 +250,8 @@ class SiteDetailsViewModel(
 
         val firebaseReference = FirebaseDatabase.getInstance().getReference("Sites")
         firebaseReference.child(site.id.toString()).child("OfferValue").setValue(newValue)
-        site.offerValue = newValue
-        _entryPrice.value = site.entryPrice - site.entryPrice * newValue
+
+        _offerValue.value = newValue
     }
 
 }

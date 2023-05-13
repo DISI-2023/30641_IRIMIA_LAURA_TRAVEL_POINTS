@@ -8,6 +8,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.travelpoints.R
 import com.example.travelpoints.adapters.SearchViewAdapter
 import com.example.travelpoints.databinding.FragmentMapBinding
 import com.example.travelpoints.helpers.LocationPermission
@@ -146,7 +147,12 @@ class MapFragment(
     private fun showSiteDetailsPopUp(site: Site) {
         binding.siteNameTv.text = site.name
         binding.descriptionTv.text = site.description
-        binding.entryPriceTv.text = site.entryPrice.toString()
+        if (site.offerValue != 0.0) {
+            binding.entryPriceTv.setTextColor(resources.getColor(R.color.red))
+        } else {
+            binding.entryPriceTv.setTextColor(resources.getColor(R.color.black))
+        }
+        binding.entryPriceTv.text = (site.entryPrice - site.entryPrice * site.offerValue).toFloat().toString()
 
         binding.constraintLayout.visibility = View.INVISIBLE
         binding.siteDetails.visibility = View.VISIBLE
@@ -162,7 +168,7 @@ class MapFragment(
     }
 
     private fun moveToUserLocation(userLatLng: LatLng) {
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng,12f))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 12f))
         map.animateCamera(CameraUpdateFactory.zoomIn())
         map.animateCamera(CameraUpdateFactory.zoomTo(12f))
     }
