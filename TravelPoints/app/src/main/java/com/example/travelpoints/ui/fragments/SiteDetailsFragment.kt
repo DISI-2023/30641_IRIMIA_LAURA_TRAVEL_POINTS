@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import com.example.travelpoints.MainActivity
 import com.example.travelpoints.models.Site
 import com.example.travelpoints.models.getActiveUserId
 import com.example.travelpoints.ui.theme.TravelPointsTheme
@@ -29,7 +30,9 @@ class SiteDetailsFragment(
                     SiteDetailsView(
                         site = site,
                         userIsLoggedIn = getActiveUserId() != null,
-                        onScreenClose = navigateToMapFragment
+                        onScreenClose = {
+                            navigateToMapFragment()
+                        }
                     )
                 }
             }

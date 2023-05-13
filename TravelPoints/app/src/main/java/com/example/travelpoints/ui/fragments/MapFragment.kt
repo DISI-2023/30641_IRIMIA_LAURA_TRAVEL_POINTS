@@ -1,18 +1,26 @@
 package com.example.travelpoints.ui.fragments
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.travelpoints.MainActivity
 import com.example.travelpoints.R
 import com.example.travelpoints.adapters.SearchViewAdapter
 import com.example.travelpoints.databinding.FragmentMapBinding
 import com.example.travelpoints.helpers.LocationPermission
 import com.example.travelpoints.models.Site
+import com.example.travelpoints.models.getActiveUserId
 import com.example.travelpoints.models.isCurrentUserAdmin
 import com.example.travelpoints.ui.viewmodels.MapFragmentViewModel
 import com.google.android.gms.location.LocationRequest
@@ -22,6 +30,11 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class MapFragment(
     private val navigateToSiteCreation: (Double, Double) -> Unit,
@@ -69,6 +82,7 @@ class MapFragment(
             } else {
                 adapter.dataList = emptyList()
             }
+            checkWishlistDiscounts()
         }
 
         binding.closeBtn.setOnClickListener {
@@ -181,5 +195,42 @@ class MapFragment(
     override fun onPause() {
         super.onPause()
         mapView.onPause()
+    }
+
+    private fun checkWishlistDiscounts() {
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            val wishlistReference = FirebaseDatabase.getInstance().getReference("Wishlist")
+            wishlistReference.addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val myWishlist = mutableListOf<Long>()
+                        snapshot.children.forEach { userWishlist ->
+                            if (userWishlist.key == getActiveUserId()) {
+                                userWishlist.children.forEach { siteInWishlist ->
+                                    if (siteInWishlist.getValue(Boolean::class.java) == true) {
+                                        myWishlist.add(siteInWishlist.key.toString().toLong())
+                                    }
+                                }
+                            }
+                        }
+                        Site.allSites!!.forEach {
+                            if (myWishlist.contains(it.id)) {
+                                if (it.offerValue > 0) {
+                                    (requireActivity() as MainActivity).generateNotification(
+                                        siteName = it.name,
+                                        oldPrice = it.entryPrice.toFloat().toString(),
+                                        newPrice = (it.entryPrice - it.entryPrice * it.offerValue).toFloat().toString(),
+                                        id = it.id.toInt()
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+        }
     }
 }

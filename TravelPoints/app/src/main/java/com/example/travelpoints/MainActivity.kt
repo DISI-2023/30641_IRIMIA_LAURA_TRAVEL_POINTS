@@ -1,28 +1,29 @@
 package com.example.travelpoints
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.travelpoints.databinding.MainActivityLayoutBinding
-import com.example.travelpoints.ui.fragments.AccountFragment
-import com.example.travelpoints.ui.fragments.ChartsFragment
-import com.example.travelpoints.ui.fragments.LoginFragment
-import com.example.travelpoints.ui.fragments.MapFragment
-import com.example.travelpoints.ui.fragments.RegisterFragment
-import com.example.travelpoints.ui.fragments.SiteCreationFragment
-import com.example.travelpoints.ui.fragments.SiteDetailsFragment
-import com.example.travelpoints.ui.fragments.SupportFragment
 import com.example.travelpoints.models.isCurrentUserAdmin
 import com.example.travelpoints.ui.fragments.*
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.Theme_TravelPoints)
 
         setupFragmentNavigation()
+        setupFirebaseMessaging()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
@@ -152,7 +154,38 @@ class MainActivity : AppCompatActivity() {
         bottomBar.menu.findItem(R.id.charts).isVisible = isCurrentUserAdmin()
     }
 
+    private fun setupFirebaseMessaging() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(object: OnCompleteListener<String>{
+            override fun onComplete(task: Task<String>) {
+                if (!task.isSuccessful) {
+                    return
+                }
+                val token = task.result
+
+                Toast.makeText(this@MainActivity, "Firebase Messaging token is $token", Toast.LENGTH_LONG).show()
+                Log.w("Reparatii", token)
+            }
+
+        })
+    }
+
+    fun generateNotification(siteName: String, oldPrice: String, newPrice: String, id: Int) {
+        val title = "Discount on $siteName"
+        val text = "From $oldPrice$ to $newPrice$"
+        val CHANNEL_ID = "MESSAGE"
+        val channel = NotificationChannel(CHANNEL_ID, "Message Notfication", NotificationManager.IMPORTANCE_DEFAULT)
+        getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+        val notification: Notification.Builder = Notification.Builder(this, CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setSmallIcon(R.drawable.ic_chart)
+            .setVibrate(longArrayOf(1000, 1000, 1000))
+            .setAutoCancel(true)
+        NotificationManagerCompat.from(this).notify(id, notification.build())
+    }
+
     companion object {
+
         val eventLiveData = MutableLiveData<Unit>()
 
         fun sendEmail(recipients: List<String>, subject: String, body: String, context: Context) {

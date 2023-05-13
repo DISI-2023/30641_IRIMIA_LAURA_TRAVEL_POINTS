@@ -27,6 +27,13 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".util.PushNotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAJ9GiVu9m5-1gT5DQX-A2O1elZ96MTA7g" />
@@ -36,5 +43,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
 </manifest>
