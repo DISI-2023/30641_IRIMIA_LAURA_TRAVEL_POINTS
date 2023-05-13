@@ -29,7 +29,7 @@ enum class Category {
 }
 
 fun fromStringToCategory(string: String): Category {
-    return when(string){
+    return when (string) {
         "Park" -> Category.Park
         "Museum" -> Category.Museum
         "Monument" -> Category.Monument
@@ -41,14 +41,27 @@ fun getActiveUserId(): String? =
     FirebaseAuth.getInstance().currentUser?.uid
 
 fun isCurrentUserAdmin(): Boolean =
-    FirebaseAuth.getInstance().currentUser?.email == "admin@gmail.com"
+    admins.contains(
+        FirebaseAuth.getInstance().currentUser?.email
+    )
+
+val admins = listOf("timaruflorin14@gmail.com", "alexbarladeanu@gmail.com", "aurelvidrean16@gmail.com", "Denisaiza@yahoo.com", "laurairimia192@gmail.com")
+
+fun getActiveUserEmail(): String =
+    FirebaseAuth.getInstance().currentUser?.email.toString()
 
 fun getMarkerIcon(category: Category, context: Context): BitmapDescriptor {
-    val identifier = when(category){
+    val identifier = when (category) {
         Category.Park -> "ic_park"
         Category.Museum -> "ic_museum"
         Category.Monument -> "ic_monument"
     }
-    val drawable: Drawable = context.resources.getDrawable(context.resources.getIdentifier(identifier, "drawable", context.packageName))
+    val drawable: Drawable = context.resources.getDrawable(
+        context.resources.getIdentifier(
+            identifier,
+            "drawable",
+            context.packageName
+        )
+    )
     return BitmapDescriptorFactory.fromBitmap(drawableToBitmap(drawable)!!)
 }
