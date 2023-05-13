@@ -37,7 +37,7 @@ class MapFragmentViewModel: ViewModel() {
                                 name,
                                 latitude,
                                 longitude,
-                                entryPrice - offerValue.times(entryPrice),
+                                entryPrice,
                                 description,
                                 category,
                                 offerValue

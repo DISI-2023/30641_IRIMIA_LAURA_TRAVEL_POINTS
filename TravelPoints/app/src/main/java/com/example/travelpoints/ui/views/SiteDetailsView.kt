@@ -62,7 +62,7 @@ fun SiteDetailsView(
     userIsLoggedIn: Boolean,
     onScreenClose: () -> Unit
 ) {
-    val entryPrice by viewModel.entryPrice.collectAsState()
+    val offerValue by viewModel.offerValue.collectAsState()
 
     BackHandler(onBack = onScreenClose)
     Scaffold(topBar = {
@@ -140,21 +140,21 @@ fun SiteDetailsView(
                     Row(
                         horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
                     ) {
-                        if (site.offerValue != 0.0) {
+                        if (offerValue != 0.0) {
                             Text(
-                                text = entryPrice.toFloat().toString(),
+                                text = (site.entryPrice - site.entryPrice * offerValue).toFloat().toString(),
                                 color = Color.Red,
                                 modifier = Modifier.padding(horizontal = 5.dp),
                             )
                             Text(
-                                text = site.entryPrice.toString(),
+                                text = site.entryPrice.toFloat().toString(),
                                 color = textColor,
                                 modifier = Modifier.padding(horizontal = 5.dp),
                                 style = TextStyle(textDecoration = TextDecoration.LineThrough)
                             )
                         } else {
                             Text(
-                                text = entryPrice.toFloat().toString(),
+                                text = site.entryPrice.toFloat().toString(),
                                 color = textColor,
                                 modifier = Modifier.padding(horizontal = 5.dp),
                             )
@@ -371,7 +371,7 @@ fun ApplyOffer(site: Site, updateOfferValue: (Double) -> Unit) {
                 value = input,
                 shape = RoundedCornerShape(8.dp),
                 onValueChange = {
-                    if (it.toIntOrNull() != null && it.length<4) {
+                    if (it.toIntOrNull() != null && it.length < 4) {
                         if (it.toInt() <= 100) {
                             input = it
                         }
