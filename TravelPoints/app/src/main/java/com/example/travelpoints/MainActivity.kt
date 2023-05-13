@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.MutableLiveData
 import com.example.travelpoints.databinding.MainActivityLayoutBinding
 import com.example.travelpoints.ui.fragments.AccountFragment
 import com.example.travelpoints.ui.fragments.ChartsFragment
@@ -16,6 +17,11 @@ import com.example.travelpoints.ui.fragments.RegisterFragment
 import com.example.travelpoints.ui.fragments.SiteCreationFragment
 import com.example.travelpoints.ui.fragments.SiteDetailsFragment
 import com.example.travelpoints.ui.fragments.SupportFragment
+import com.example.travelpoints.models.isCurrentUserAdmin
+import com.example.travelpoints.ui.fragments.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
@@ -25,6 +31,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var loginFragment: LoginFragment
     private lateinit var mapFragment: MapFragment
 
+    private lateinit var bottomBar: BottomNavigationView
+
+    init {
+        eventLiveData.observeForever{updateBottomBarVisibility()}
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = MainActivityLayoutBinding.inflate(layoutInflater)
@@ -36,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupFragmentNavigation() {
-        val bottomBar = binding.bottomNavigationView
+        bottomBar = binding.bottomNavigationView
 
         val accountFragment = AccountFragment(
             navigateToLoginFragment = {
@@ -99,6 +110,8 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, mapFragment)
             .commit()
 
+        updateBottomBarVisibility()
+
         binding.bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.account -> {
@@ -134,7 +147,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateBottomBarVisibility() {
+        bottomBar.menu.findItem(R.id.support).isVisible = !isCurrentUserAdmin()
+        bottomBar.menu.findItem(R.id.charts).isVisible = isCurrentUserAdmin()
+    }
+
     companion object {
+        val eventLiveData = MutableLiveData<Unit>()
+
         fun sendEmail(recipients: List<String>, subject: String, body: String, context: Context) {
 
             val addresses: Array<String> = recipients.toTypedArray()
