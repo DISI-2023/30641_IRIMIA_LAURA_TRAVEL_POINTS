@@ -21,7 +21,6 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
-import com.google.firebase.auth.FirebaseAuth
 
 class MapFragment(
     private val navigateToSiteCreation: (Double, Double) -> Unit,

@@ -80,6 +80,7 @@ class MainActivity : AppCompatActivity() {
                     .replace(R.id.fragment_container, accountFragment).commit()
             }
         )
+        val chartsFragment = ChartsFragment()
 
 
         val bottomBar = binding.bottomNavigationView
@@ -109,6 +110,11 @@ class MainActivity : AppCompatActivity() {
                 R.id.support -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, supportFragment)
+                        .commit()
+                }
+                R.id.charts -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, chartsFragment)
                         .commit()
                 }
             }

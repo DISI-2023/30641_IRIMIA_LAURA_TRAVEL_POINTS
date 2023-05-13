@@ -53,8 +53,8 @@ class LoginFragment(
                 return@setOnClickListener
             }
 
-            if (passwordField.length < 4) {
-                password.error = "Password needs to be at least 5 characters long"
+            if (passwordField.length < 5) {
+                password.error = "Password needs to be at least 6 characters long"
                 return@setOnClickListener
             }
 
