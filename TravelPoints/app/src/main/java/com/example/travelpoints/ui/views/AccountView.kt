@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.travelpoints.models.Site
+import com.example.travelpoints.models.getActiveUserEmail
 import com.example.travelpoints.ui.viewmodels.AccountViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -42,7 +43,7 @@ fun AccountView(
                 color = Color.Black
             )
             Text(
-                text = FirebaseAuth.getInstance().currentUser?.email.toString(),
+                text = getActiveUserEmail(),
                 fontSize = 22.sp,
                 color = MaterialTheme.colors.primary
             )

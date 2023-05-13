@@ -1,9 +1,13 @@
 package com.example.travelpoints
 
+import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import com.example.travelpoints.databinding.MainActivityLayoutBinding
 import com.example.travelpoints.ui.fragments.*
 import com.google.android.gms.maps.model.LatLng
@@ -119,6 +123,21 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             true
+        }
+    }
+
+    companion object {
+        fun sendEmail(recipients: List<String>, subject: String, body: String, context: Context) {
+
+            val addresses: Array<String> = recipients.toTypedArray()
+
+            val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:")
+                putExtra(Intent.EXTRA_EMAIL, addresses)
+                putExtra(Intent.EXTRA_SUBJECT,subject)
+                putExtra(Intent.EXTRA_TEXT, body)
+            }
+            startActivity(context, Intent.createChooser(emailIntent, "Send Email"), null)
         }
     }
 }

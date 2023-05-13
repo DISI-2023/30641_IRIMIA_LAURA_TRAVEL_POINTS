@@ -325,6 +325,6 @@ private fun CommentsSectionView(
     }
 }
 
-private fun showLoginToast(context: Context) {
+fun showLoginToast(context: Context) {
     Toast.makeText(context, "You must be logged in to interact", Toast.LENGTH_SHORT).show()
 }
