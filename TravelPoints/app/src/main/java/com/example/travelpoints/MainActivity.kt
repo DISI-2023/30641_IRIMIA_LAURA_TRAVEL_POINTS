@@ -161,11 +161,7 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 val token = task.result
-
-                Toast.makeText(this@MainActivity, "Firebase Messaging token is $token", Toast.LENGTH_LONG).show()
-                Log.w("Reparatii", token)
             }
-
         })
     }
 
